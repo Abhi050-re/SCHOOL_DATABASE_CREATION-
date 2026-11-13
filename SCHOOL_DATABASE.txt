@@ -98,6 +98,7 @@ CREATE TABLE FACT_Teacher            -- CREATE FACT TABLE FOR FACT_TEACHER WITH 
 	TeacherFactKey INT Identity(1,1) Primary key,    -- HERE WE HAVE LINKED TeacherKey and DepartmentKey from Dimension Tables for Teacher and Department 
 	TeacherID INT UNIQUE,
 	TeacherKey INT,
+	DepartmentKey INT,
 	Salary Decimal(12,2),
 	Experience Decimal(12,2)
 
@@ -107,3 +108,33 @@ CREATE TABLE FACT_Teacher            -- CREATE FACT TABLE FOR FACT_TEACHER WITH 
 			Foreign Key (DepartmentKey)
 			REFERENCES Dim_Department (DepartmentKey)
 );
+
+
+/*EXPLANATION*/
+Part 1: Database and base table
+
+>CREATE DATABASE School makes the database
+>USE School switches to it, so everything after lands inside School
+>CREATE TABLE Teacher makes the source table. teacher_id is the primary key with IDENTITY(1,1), so it numbers rows 1, 2, 3...
+>Salary and Experience are Float (decimal numbers)
+>The 4 INSERT batches add 32 teachers. You skip teacher_id because IDENTITY fills it
+
+Part 2: Dim_Department
+
+>DepartmentKey is the surrogate key (auto-number, used for joins)
+>DepartmentID is the business key (D01, D02...), and UNIQUE blocks duplicates
+>The INSERT ... SELECT DISTINCT dept_id, dept FROM Teacher copies each department once, giving 8 rows
+
+Part 3: Dim_Teacher
+
+>Same pattern: TeacherKey is the surrogate key, TeacherID is the business key
+>The INSERT ... SELECT copies teacher_id and Name, giving 32 rows
+>SELECT COUNT(*) counts the rows (expect 32)
+
+Part 4: FACT_Teacher
+
+>TeacherFactKey is the fact table’s own primary key
+>TeacherID is the degenerate key (original ID kept in the fact table)
+>TeacherKey links to Dim_Teacher
+>Salary and Experience are the facts (numbers to analyze)
+>The Foreign Key lines link the keys to the dimension tables, and REFERENCES says which table and column they point to
