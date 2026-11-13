@@ -1,0 +1,109 @@
+CREATE DATABASE School                                       -- CREATE DATABASE TABLE AND INSERT DATA
+
+USE School
+
+CREATE TABLE Teacher
+(
+	teacher_id INT IDENTITY(1,1) PRIMARY KEY,
+	dept_id CHAR(10),
+	dept CHAR(10),
+	Name VARCHAR(30),
+	Subject VARCHAR(30),
+	Salary Float,
+	Experience Float
+);
+
+Select * FROM Teacher
+
+INSERT INTO Teacher (dept_id, dept, Name, Subject, Salary, Experience)
+VALUES
+('D01', 'Science', 'Anil Kumar', 'Physics', 55000, 8.5),
+('D01', 'Science', 'Priya Sharma', 'Chemistry', 52000, 6),
+('D02', 'Maths', 'Ravi Teja', 'Algebra', 48000, 4.5),
+('D02', 'Maths', 'Sneha Reddy', 'Calculus', 60000, 10),
+('D03', 'English', 'Meera Nair', 'Literature', 45000, 3),
+('D03', 'English', 'John Mathew', 'Grammar', 50000, 7.5),
+('D04', 'CS', 'Kiran Rao', 'Databases', 65000, 9),
+('D04', 'CS', 'Divya Menon', 'Python', 58000, 5);
+
+INSERT INTO Teacher (dept_id, dept, Name, Subject, Salary, Experience)
+VALUES
+('D01', 'Science', 'Vikram Singh', 'Biology', 54000, 7),
+('D01', 'Science', 'Lakshmi Iyer', 'Physics', 61000, 11.5),
+('D02', 'Maths', 'Arjun Das', 'Geometry', 47000, 3.5),
+('D02', 'Maths', 'Nisha Patel', 'Statistics', 56000, 8),
+('D03', 'English', 'Farah Khan', 'Poetry', 49000, 5.5),
+('D03', 'English', 'David Joseph', 'Writing', 52000, 9),
+('D04', 'CS', 'Rohit Verma', 'Networks', 62000, 6.5),
+('D04', 'CS', 'Ananya Gupta', 'AI Basics', 70000, 12);
+
+INSERT INTO Teacher (dept_id, dept, Name, Subject, Salary, Experience)
+VALUES
+('D05', 'History', 'Suresh Babu', 'Ancient History', 46000, 6),
+('D05', 'History', 'Kavya Reddy', 'Modern History', 51000, 8.5),
+('D05', 'History', 'Imran Ali', 'Civics', 44000, 3.5),
+('D06', 'Commerce', 'Pooja Jain', 'Accounting', 53000, 7),
+('D06', 'Commerce', 'Harish Naidu', 'Economics', 59000, 10.5),
+('D06', 'Commerce', 'Swathi Rao', 'Business Studies', 48000, 4),
+('D01', 'Science', 'Mohan Krishna', 'Chemistry', 57000, 9.5),
+('D04', 'CS', 'Tanvi Shah', 'Cyber Security', 68000, 8);
+
+INSERT INTO Teacher (dept_id, dept, Name, Subject, Salary, Experience)
+VALUES
+('D07', 'Arts', 'Neha Kapoor', 'Painting', 43000, 4.5),
+('D07', 'Arts', 'Rajesh Pillai', 'Music', 47000, 9),
+('D07', 'Arts', 'Sana Mirza', 'Dance', 42000, 3),
+('D08', 'Sports', 'Karthik Raj', 'Cricket', 50000, 10),
+('D08', 'Sports', 'Deepa Nambiar', 'Athletics', 46000, 6.5),
+('D08', 'Sports', 'Arun Menon', 'Football', 48000, 7),
+('D02', 'Maths', 'Geeta Rani', 'Trigonometry', 54000, 6),
+('D03', 'English', 'Peter Fernandes', 'Drama', 51000, 8);
+
+-- CREATION OF DB, TABLE END'S HERE
+
+CREATE TABLE Dim_Department						-- CREATE DIMENSION TABLE WITH A PRIMARY KEY AND IDENTITY FOR ID'S(SURROGATE KEY)
+(
+	DepartmentKey INT IDENTITY(1,1) PRIMARY KEY,
+	DepartmentID VARCHAR(50) UNIQUE,
+	DepartmentName VARCHAR(50)
+);
+
+SELECT * FROM Dim_Department
+
+INSERT INTO                                           -- INSERT VALUES FROM THE ACTUAL TABLE TO THE DIMENSION TABLE
+	Dim_Department(DepartmentID, DepartmentName)
+	Select DISTINCT dept_id, dept
+	From Teacher;
+
+SELECT * FROM Dim_Department
+
+CREATE TABLE Dim_Teacher							-- CREATE ANOTHER DIMENSION TABLE 
+(
+	TeacherKey INT IDENTITY(1,1) PRIMARY KEY,
+	TeacherID INT UNIQUE,
+	TeacherName VARCHAR(50)
+);
+
+INSERT INTO
+	Dim_Teacher(TeacherID, TeacherName)
+	SELECT DISTINCT teacher_id, NAME
+	FROM Teacher;
+
+SELECT * FROM Dim_Teacher
+
+SELECT COUNT(*) FROM Dim_Teacher; 
+
+CREATE TABLE FACT_Teacher            -- CREATE FACT TABLE FOR FACT_TEACHER WITH FORIEGN KEY LINKING TO DIMENSION TABLE, HERE YOU CAN STORE AND ACCESS VALUES
+(	
+	TeacherFactKey INT Identity(1,1) Primary key,    -- HERE WE HAVE LINKED TeacherKey and DepartmentKey from Dimension Tables for Teacher and Department 
+	TeacherID INT UNIQUE,
+	TeacherKey INT,
+	Salary Decimal(12,2),
+	Experience Decimal(12,2)
+
+			Foreign Key (TeacherKey)						-- LINKING THEM TO DIM TABLE USING FORIEGN KEYS AND REFERENECING THEM
+			REFERENCES Dim_Teacher(TeacherKey),             -- REFERENECING SHOWS WHAT THAT KEY REFERENCES TO
+
+			Foreign Key (DepartmentKey)
+			REFERENCES Dim_Department (DepartmentKey)
+);
